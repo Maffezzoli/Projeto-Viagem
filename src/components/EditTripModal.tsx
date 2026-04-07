@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Users, MapPin, Tag, Image as ImageIcon, Trash2, AlertCircle } from 'lucide-react';
+import { X, Tag, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { PlaceSelector } from './PlaceSelector';
 import { FileUpload } from './FileUpload';

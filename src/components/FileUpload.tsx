@@ -17,7 +17,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   currentFileUrl,
   onUploadSuccess,
   onRemove,
-  label = "Anexar arquivo",
+  label,
 }) => {
   const [isUploading, setIsLoading] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
@@ -74,6 +74,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   return (
     <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
+      {label ? <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{label}</p> : null}
       {currentFileUrl ? (
         <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-2xl group shadow-sm transition-all hover:border-blue-200">
           <div className="flex items-center space-x-3 overflow-hidden">

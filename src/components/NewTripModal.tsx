@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, Users } from 'lucide-react';
+import { X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { PlaceSelector } from './PlaceSelector';
 

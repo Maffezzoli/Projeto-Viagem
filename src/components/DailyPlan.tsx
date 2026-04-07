@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Plus, Clock, Calendar, FileText, Eye } from 'lucide-react';
+import { ChevronDown, Plus, Clock, Calendar, FileText, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ActivityModal } from './ActivityModal';

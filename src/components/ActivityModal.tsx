@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Clock, AlignLeft, MapPin, AlertCircle, FileText } from 'lucide-react';
+import { X, Clock, MapPin, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { FileUpload } from './FileUpload';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface Activity {
   id?: string;
@@ -21,6 +21,7 @@ interface ActivityModalProps {
   tripId: string;
   activityDate: string;
   activity?: Activity;
+  isReadOnly?: boolean;
 }
 
 export const ActivityModal: React.FC<ActivityModalProps> = ({
@@ -30,6 +31,7 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
   tripId,
   activityDate,
   activity,
+  isReadOnly = false,
 }) => {
   const [description, setDescription] = useState('');
   const [timeRange, setTimeRange] = useState('');
@@ -56,6 +58,8 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isReadOnly) return;
+    
     setIsLoading(true);
     setError('');
 
@@ -87,7 +91,7 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
   };
 
   const handleDelete = async () => {
-    if (!activity?.id || !confirm('Deseja excluir esta atividade?')) return;
+    if (isReadOnly || !activity?.id || !confirm('Deseja excluir esta atividade?')) return;
     setIsLoading(true);
     const { error } = await supabase.from('daily_activities').delete().eq('id', activity.id);
     if (!error) { onSuccess(); onClose(); }
@@ -104,7 +108,7 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
         <div className="flex items-center justify-between p-8 border-b border-slate-50 dark:border-slate-800">
           <div>
             <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-              {activity ? 'Editar Atividade' : 'Nova Atividade'}
+              {isReadOnly ? 'Detalhes da Atividade' : (activity ? 'Editar Atividade' : 'Nova Atividade')}
             </h2>
             <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Planejamento Diário</p>
           </div>
@@ -115,13 +119,14 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
           <div className="space-y-3">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">O que vamos fazer?</label>
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Descrição</label>
             <textarea
               required
+              disabled={isReadOnly}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Ex: Visita ao Museu do Louvre (Markdown suportado)"
-              className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 resize-none font-medium"
+              placeholder="Ex: Visita ao Museu do Louvre"
+              className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 resize-none font-medium disabled:opacity-70"
             />
           </div>
 
@@ -132,10 +137,11 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="text"
+                  disabled={isReadOnly}
                   value={timeRange}
                   onChange={(e) => setTimeRange(e.target.value)}
                   placeholder="Ex: 10:00 - 12:00"
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-xs"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-xs disabled:opacity-70"
                 />
               </div>
             </div>
@@ -145,46 +151,69 @@ export const ActivityModal: React.FC<ActivityModalProps> = ({
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="url"
+                  disabled={isReadOnly}
                   value={mapsUrl}
                   onChange={(e) => setMapsUrl(e.target.value)}
                   placeholder="https://maps..."
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-xs"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-xs disabled:opacity-70"
                 />
               </div>
             </div>
           </div>
 
           <div className="space-y-3">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Anexo (Opcional)</label>
-            <FileUpload
-              bucket="travel-assets"
-              filePath={`trip-${tripId}-act-${activity?.id || 'new'}`}
-              currentFileUrl={fileUrl}
-              onUploadSuccess={setFileUrl}
-              onRemove={() => setFileUrl(null)}
-            />
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Anexo</label>
+            {isReadOnly ? (
+              fileUrl ? (
+                <div className="flex items-center space-x-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 rounded-2xl">
+                  <div className="bg-blue-600 p-2 rounded-lg text-white">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <a 
+                    href={fileUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[10px] font-black text-blue-700 dark:text-blue-400 hover:underline uppercase tracking-widest"
+                  >
+                    Abrir Comprovante
+                  </a>
+                </div>
+              ) : (
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Nenhum anexo</p>
+              )
+            ) : (
+              <FileUpload
+                bucket="travel-assets"
+                filePath={`trip-${tripId}-act-${activity?.id || 'new'}`}
+                currentFileUrl={fileUrl}
+                onUploadSuccess={setFileUrl}
+                onRemove={() => setFileUrl(null)}
+              />
+            )}
           </div>
 
           {error && <p className="text-red-500 text-xs font-bold bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-900/30">{error}</p>}
 
-          <div className="flex flex-col gap-3 pt-4">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-200 dark:shadow-none uppercase tracking-widest text-[10px] cursor-pointer"
-            >
-              {isLoading ? 'Salvando...' : 'Confirmar Atividade'}
-            </button>
-            {activity?.id && (
+          {!isReadOnly && (
+            <div className="flex flex-col gap-3 pt-4">
               <button
-                type="button"
-                onClick={handleDelete}
-                className="w-full bg-transparent text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-black py-4 rounded-2xl transition-all uppercase tracking-widest text-[10px] cursor-pointer"
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-200 dark:shadow-none uppercase tracking-widest text-[10px] cursor-pointer"
               >
-                Remover Atividade
+                {isLoading ? 'Salvando...' : 'Confirmar Atividade'}
               </button>
-            )}
-          </div>
+              {activity?.id && (
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="w-full bg-transparent text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-black py-4 rounded-2xl transition-all uppercase tracking-widest text-[10px] cursor-pointer"
+                >
+                  Remover Atividade
+                </button>
+              )}
+            </div>
+          )}
         </form>
       </motion.div>
     </div>

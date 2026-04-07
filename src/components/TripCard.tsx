@@ -20,7 +20,6 @@ export const TripCard: React.FC<TripCardProps> = ({
   destination,
   nickname,
   start_date,
-  end_date,
   people_count,
   location_image_url,
   onClick,
