@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+/* Enable class-based dark mode in Tailwind 4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f8fafc; /* slate-50 */
+  --foreground: #0f172a; /* slate-900 */
+}
+
+.dark {
+  --background: #020617; /* slate-950 */
+  --foreground: #f8fafc; /* slate-50 */
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 300ms;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global Cursor Pointer Fix */
+button, 
+a, 
+select,
+input[type="date"],
+input[type="checkbox"],
+input[type="radio"],
+[role="button"] {
+  cursor: pointer !important;
+}
+
+button:disabled,
+input:disabled {
+  cursor: not-allowed !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 dark:bg-slate-800 rounded-full hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors;
+}
+
+/* Typography & Prose for Dark Mode */
+.prose {
+  @apply text-slate-700 dark:text-slate-300 max-w-none;
+}
+.prose strong, .prose h1, .prose h2, .prose h3 {
+  @apply text-slate-900 dark:text-white font-bold;
+}
