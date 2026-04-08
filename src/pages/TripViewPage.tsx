@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Header } from '../components/Header';
 import { SnippetBlock } from '../components/SnippetBlock';
 import { DailyPlan } from '../components/DailyPlan';
 import { EditTripModal } from '../components/EditTripModal';
@@ -116,7 +115,6 @@ export const TripViewPage: React.FC = () => {
   if (isLoading || !trip) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
-        <Header />
         <div className="animate-pulse space-y-8">
           <div className="h-[50vh] bg-slate-200 dark:bg-slate-900"></div>
           <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -139,10 +137,6 @@ export const TripViewPage: React.FC = () => {
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors pb-20"
     >
-      <div className="absolute top-0 left-0 right-0 z-20">
-        <Header transparent absolute />
-      </div>
-      
       <div className="relative h-[60vh] min-h-[450px] w-full overflow-hidden">
         <motion.img 
           initial={{ scale: 1.1 }}
@@ -157,7 +151,7 @@ export const TripViewPage: React.FC = () => {
         <div className="absolute inset-0 flex flex-col justify-end">
           <div className="max-w-6xl mx-auto w-full px-6 pb-12">
             <div className="space-y-8">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
                   <Link to="/dashboard" className="inline-flex items-center space-x-2 text-white/70 hover:text-white transition-all text-[10px] font-black uppercase tracking-[0.2em] group cursor-pointer bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
                     <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
@@ -165,15 +159,15 @@ export const TripViewPage: React.FC = () => {
                   </Link>
                 </motion.div>
 
-                <div className="flex items-center gap-2">
+                <div className="w-full sm:w-auto flex flex-wrap items-center justify-end gap-2">
                   <motion.button 
                     initial={{ y: 10, opacity: 0 }} 
                     animate={{ y: 0, opacity: 1 }} 
                     transition={{ delay: 0.3 }}
                     onClick={() => setIsReadOnly(!isReadOnly)}
-                    className={`flex items-center space-x-2 px-5 py-2.5 rounded-full backdrop-blur-md border transition-all text-[10px] font-black uppercase tracking-widest cursor-pointer ${isReadOnly ? 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20' : 'bg-blue-600 border-blue-500 text-white shadow-xl'}`}
+                    className={`flex items-center space-x-2 px-4 sm:px-5 py-2.5 rounded-full backdrop-blur-md border transition-all text-[10px] font-black uppercase tracking-widest cursor-pointer ${isReadOnly ? 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20' : 'bg-blue-600 border-blue-500 text-white shadow-xl'}`}
                   >
-                    {isReadOnly ? <><Lock className="w-3.5 h-3.5" /><span>Trava</span></> : <><Unlock className="w-3.5 h-3.5" /><span>Editar</span></>}
+                    {isReadOnly ? <><Lock className="w-3.5 h-3.5" /><span className="hidden sm:inline">Trava</span></> : <><Unlock className="w-3.5 h-3.5" /><span className="hidden sm:inline">Editar</span></>}
                   </motion.button>
 
                   <div className="flex items-center gap-2 bg-black/20 backdrop-blur-md p-1 rounded-2xl border border-white/10">
