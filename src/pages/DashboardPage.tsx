@@ -19,12 +19,10 @@ interface Trip {
   location_image_url?: string | null;
 }
 
-const DEFAULT_HERO = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=1920&auto=format&fit=crop';
-
 export const DashboardPage: React.FC = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
-  // Initialize with a default or empty string but NOT null if we want to avoid mount flicker
-  const [heroImage, setHeroImage] = useState<string>(DEFAULT_HERO);
+  // Initialize with null to avoid mount flicker. Prefer black/dark over placeholder.
+  const [heroImage, setHeroImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -39,6 +37,9 @@ export const DashboardPage: React.FC = () => {
       const { data: settingsData } = await supabase.from('app_settings').select('value').eq('key', 'dashboard_hero_image').single();
       if (settingsData?.value) {
         setHeroImage(settingsData.value);
+      } else {
+        // Fallback only if no setting exists
+        setHeroImage('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=1920&auto=format&fit=crop');
       }
     } catch (err) {
       console.error(err);
@@ -69,18 +70,20 @@ export const DashboardPage: React.FC = () => {
       <Header transparent absolute onSettingsClick={() => setIsSettingsOpen(true)} />
       
       {/* Edge-to-Edge Dynamic Hero Section */}
-      <div className="relative pt-32 pb-32 overflow-hidden min-h-[550px] flex items-center bg-slate-900">
+      <div className="relative pt-32 pb-32 overflow-hidden min-h-[550px] flex items-center bg-slate-950">
         <AnimatePresence mode="wait">
-          <motion.img 
-            key={heroImage}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            src={heroImage} 
-            alt="Dashboard Hero" 
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          {heroImage && (
+            <motion.img 
+              key={heroImage}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1 }}
+              src={heroImage} 
+              alt="Dashboard Hero" 
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          )}
         </AnimatePresence>
         
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/40 to-slate-50 dark:to-slate-950"></div>
@@ -178,7 +181,7 @@ export const DashboardPage: React.FC = () => {
 
       <NewTripModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchData} />
       {editingTrip && <EditTripModal isOpen={!!editingTrip} onClose={() => setEditingTrip(null)} onSuccess={fetchData} trip={editingTrip} />}
-      <AppSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onSuccess={fetchData} currentHeroImage={heroImage} />
+      <AppSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onSuccess={fetchData} currentHeroImage={heroImage || ''} />
     </motion.div>
   );
 };

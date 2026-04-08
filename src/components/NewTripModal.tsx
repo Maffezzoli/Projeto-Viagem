@@ -91,7 +91,7 @@ export const NewTripModal: React.FC<NewTripModalProps> = ({
 
           {error && <p className="text-red-500 text-xs font-bold bg-red-50 p-3 rounded-lg border border-red-100">{error}</p>}
 
-          <button type="submit" disabled={isLoading} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-200 uppercase tracking-widest text-[10px] cursor-pointer mt-4">
+          <button type="submit" disabled={isLoading} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-black py-4 rounded-2xl transition-all shadow-lg dark:shadow-none uppercase tracking-widest text-[10px] cursor-pointer mt-4">
             {isLoading ? 'Criando...' : 'Confirmar Viagem'}
           </button>
         </form>

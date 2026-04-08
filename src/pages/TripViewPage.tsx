@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Header } from '../components/Header';
 import { SnippetBlock } from '../components/SnippetBlock';
 import { DailyPlan } from '../components/DailyPlan';
 import { EditTripModal } from '../components/EditTripModal';
@@ -10,7 +11,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { ChevronLeft, Hotel, Ticket, Calendar as CalendarIcon, Users, Settings, Download, Loader2, Lock, Unlock, FileCode } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TripDetails {
   trip_id: string;
@@ -115,6 +116,7 @@ export const TripViewPage: React.FC = () => {
   if (isLoading || !trip) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
+        <Header />
         <div className="animate-pulse space-y-8">
           <div className="h-[50vh] bg-slate-200 dark:bg-slate-900"></div>
           <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -126,7 +128,7 @@ export const TripViewPage: React.FC = () => {
     );
   }
 
-  const heroImage = trip.location_image_url || `https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=1920&auto=format&fit=crop`;
+  const heroImage = trip.location_image_url;
   const displayTitle = trip.nickname || trip.destination.split(',')[0];
 
   return (
@@ -137,15 +139,24 @@ export const TripViewPage: React.FC = () => {
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors pb-20"
     >
-      <div className="relative h-[60vh] min-h-[450px] w-full overflow-hidden">
-        <motion.img 
-          initial={{ scale: 1.1 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          src={heroImage} 
-          alt={trip.destination} 
-          className="absolute inset-0 w-full h-full object-cover" 
-        />
+      <div className="absolute top-0 left-0 right-0 z-20">
+        <Header transparent absolute />
+      </div>
+      
+      <div className="relative h-[65vh] min-h-[450px] w-full overflow-hidden bg-slate-950">
+        <AnimatePresence mode="wait">
+          {heroImage && (
+            <motion.img 
+              key={heroImage}
+              initial={{ scale: 1.1, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+              src={heroImage} 
+              alt={trip.destination} 
+              className="absolute inset-0 w-full h-full object-cover" 
+            />
+          )}
+        </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/20 to-slate-50 dark:to-slate-950"></div>
         
         <div className="absolute inset-0 flex flex-col justify-end">

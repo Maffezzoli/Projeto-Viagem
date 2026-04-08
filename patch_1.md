@@ -10,6 +10,8 @@ Este patch foca em resolver problemas críticos de responsividade, transformar b
 - [x] Remover preview de imagem automática de links do Google Maps.
 - [x] Melhorar visibilidade do input de senha na `GatePage`.
 - [x] Eliminar flicker de imagem no Dashboard e suavizar transições.
+- [x] Remover sombras de botões inadequadas no Modo Dark.
+- [x] Substituir placeholders de imagem instáveis por fundos sólidos durante o carregamento.
 
 ### 2. 🏗️ Estrutura de Dados (Campos Específicos)
 - [x] Transformar `accommodation_snippet` em campos: Nome, Check-in, Check-out, Endereço/Link.
@@ -32,6 +34,12 @@ Este patch foca em resolver problemas críticos de responsividade, transformar b
 - [x] Implementar suporte a múltiplas páginas no PDF via `window.print()`.
 - [x] Ajustar layout do documento para os novos campos estruturados.
 - [x] Suporte a temas (Light/Dark) na exportação do PDF.
+
+## ⚠️ Observações de Manutenção (Anti-Regressão)
+- **Header:** Manter `flex-row` simples com `gap-2` e `justify-between`. Evitar layouts complexos que empilham botões de forma imprevisível.
+- **Imagens:** Nunca usar URLs de placeholder externas (ex: Unsplash genérico) como valor inicial de estado se isso causar "flicker". Preferir `null` ou cores sólidas (`slate-900`).
+- **Sombras:** No modo Dark, remover sombras claras (`shadow-blue-200`, etc) que criam halos brancos artificiais.
+- **Transições:** Manter transições de opacidade puras via `framer-motion` sem deslocamento de eixo (X/Y) agressivo para garantir estabilidade visual.
 
 ---
 *Status: Concluído e Refinado*
