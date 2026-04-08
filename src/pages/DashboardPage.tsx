@@ -19,10 +19,11 @@ interface Trip {
   location_image_url?: string | null;
 }
 
+const DEFAULT_HERO = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=1920&auto=format&fit=crop';
+
 export const DashboardPage: React.FC = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
-  // Initialize with null to avoid mount flicker. Prefer black/dark over placeholder.
-  const [heroImage, setHeroImage] = useState<string | null>(null);
+  const [heroImage, setHeroImage] = useState<string>(DEFAULT_HERO);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -37,9 +38,6 @@ export const DashboardPage: React.FC = () => {
       const { data: settingsData } = await supabase.from('app_settings').select('value').eq('key', 'dashboard_hero_image').single();
       if (settingsData?.value) {
         setHeroImage(settingsData.value);
-      } else {
-        // Fallback only if no setting exists
-        setHeroImage('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=1920&auto=format&fit=crop');
       }
     } catch (err) {
       console.error(err);
@@ -70,7 +68,7 @@ export const DashboardPage: React.FC = () => {
       <Header transparent absolute onSettingsClick={() => setIsSettingsOpen(true)} />
       
       {/* Edge-to-Edge Dynamic Hero Section */}
-      <div className="relative pt-32 pb-32 overflow-hidden min-h-[550px] flex items-center bg-slate-950">
+      <div className="relative pt-40 pb-32 md:pt-32 overflow-hidden min-h-[550px] flex items-center bg-slate-950">
         <AnimatePresence mode="wait">
           {heroImage && (
             <motion.img 
@@ -106,7 +104,7 @@ export const DashboardPage: React.FC = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="text-6xl md:text-8xl font-black text-white tracking-tighter leading-none drop-shadow-2xl"
+                  className="text-5xl sm:text-7xl md:text-8xl font-black text-white tracking-tighter leading-none drop-shadow-2xl"
                 >
                   Minhas <br /><span className="text-blue-500">Aventuras.</span>
                 </motion.h1>
@@ -181,7 +179,7 @@ export const DashboardPage: React.FC = () => {
 
       <NewTripModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchData} />
       {editingTrip && <EditTripModal isOpen={!!editingTrip} onClose={() => setEditingTrip(null)} onSuccess={fetchData} trip={editingTrip} />}
-      <AppSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onSuccess={fetchData} currentHeroImage={heroImage || ''} />
+      <AppSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onSuccess={fetchData} currentHeroImage={heroImage} />
     </motion.div>
   );
 };

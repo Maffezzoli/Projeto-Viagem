@@ -143,7 +143,7 @@ export const TripViewPage: React.FC = () => {
         <Header transparent absolute />
       </div>
       
-      <div className="relative h-[65vh] min-h-[450px] w-full overflow-hidden bg-slate-950">
+      <div className="relative h-[65vh] min-h-[500px] w-full overflow-hidden bg-slate-950">
         <AnimatePresence mode="wait">
           {heroImage && (
             <motion.img 
@@ -159,10 +159,11 @@ export const TripViewPage: React.FC = () => {
         </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/20 to-slate-50 dark:to-slate-950"></div>
         
-        <div className="absolute inset-0 flex flex-col justify-end">
-          <div className="max-w-6xl mx-auto w-full px-6 pb-12">
+        <div className="absolute inset-0 flex flex-col justify-end pb-16">
+          <div className="max-w-6xl mx-auto w-full px-6">
             <div className="space-y-8">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              {/* Ultra Responsive Action Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-16 md:pt-0">
                 <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
                   <Link to="/dashboard" className="inline-flex items-center space-x-2 text-white/70 hover:text-white transition-all text-[10px] font-black uppercase tracking-[0.2em] group cursor-pointer bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
                     <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
@@ -214,7 +215,14 @@ export const TripViewPage: React.FC = () => {
               
               <div className="space-y-2 text-left">
                 <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg">Roteiro Oficial</motion.div>
-                <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="text-5xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tighter leading-none drop-shadow-sm">{displayTitle}</motion.h1>
+                <motion.h1 
+                  initial={{ y: 20, opacity: 0 }} 
+                  animate={{ y: 0, opacity: 1 }} 
+                  transition={{ delay: 0.4 }} 
+                  className="text-5xl sm:text-7xl md:text-9xl font-black text-slate-900 dark:text-white tracking-tighter leading-none drop-shadow-sm"
+                >
+                  {displayTitle}
+                </motion.h1>
                 <p className="text-slate-600 dark:text-slate-400 font-bold text-lg ml-1 uppercase tracking-widest opacity-80 italic">{trip.destination}</p>
               </div>
               
@@ -235,7 +243,7 @@ export const TripViewPage: React.FC = () => {
         </div>
       </div>
 
-      <main className="max-w-6xl mx-auto px-6 -mt-8 relative z-10">
+      <main className="max-w-6xl mx-auto px-6 -mt-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
           <SnippetBlock
             type="accommodation"
