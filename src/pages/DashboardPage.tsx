@@ -19,9 +19,12 @@ interface Trip {
   location_image_url?: string | null;
 }
 
+const DEFAULT_HERO = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=1920&auto=format&fit=crop';
+
 export const DashboardPage: React.FC = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [heroImage, setHeroImage] = useState<string | null>(null);
+  // Initialize with a default or empty string but NOT null if we want to avoid mount flicker
+  const [heroImage, setHeroImage] = useState<string>(DEFAULT_HERO);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -29,18 +32,19 @@ export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
 
   const fetchData = async () => {
-    // Keep old data visible during reloads to avoid flicker
-    const { data: tripsData } = await supabase.from('trips').select('*').order('start_date', { ascending: true });
-    if (tripsData) setTrips(tripsData);
+    try {
+      const { data: tripsData } = await supabase.from('trips').select('*').order('start_date', { ascending: true });
+      if (tripsData) setTrips(tripsData);
 
-    const { data: settingsData } = await supabase.from('app_settings').select('value').eq('key', 'dashboard_hero_image').single();
-    if (settingsData?.value) {
-      setHeroImage(settingsData.value);
-    } else {
-      setHeroImage('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=1920&auto=format&fit=crop');
+      const { data: settingsData } = await supabase.from('app_settings').select('value').eq('key', 'dashboard_hero_image').single();
+      if (settingsData?.value) {
+        setHeroImage(settingsData.value);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -54,25 +58,6 @@ export const DashboardPage: React.FC = () => {
     if (trip) setEditingTrip(trip);
   };
 
-  if (isLoading && trips.length === 0) {
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
-        <Header transparent absolute />
-        <div className="relative bg-slate-900 pt-32 pb-24 overflow-hidden h-[500px]">
-           <div className="max-w-6xl mx-auto px-4 animate-pulse space-y-8 mt-20">
-              <div className="h-12 w-48 bg-slate-800 rounded-full"></div>
-              <div className="h-24 w-full md:w-[600px] bg-slate-800 rounded-3xl"></div>
-           </div>
-        </div>
-        <main className="max-w-6xl mx-auto px-6 -mt-12 relative z-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-72 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm animate-pulse border border-slate-100 dark:border-slate-800"></div>
-          ))}
-        </main>
-      </div>
-    );
-  }
-
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -83,26 +68,26 @@ export const DashboardPage: React.FC = () => {
     >
       <Header transparent absolute onSettingsClick={() => setIsSettingsOpen(true)} />
       
-      <div className="relative pt-32 pb-32 overflow-hidden min-h-[550px] flex items-center">
-        <AnimatePresence>
-          {heroImage && (
-            <motion.img 
-              key={heroImage}
-              initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              src={heroImage} 
-              alt="Dashboard Hero" 
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          )}
+      {/* Edge-to-Edge Dynamic Hero Section */}
+      <div className="relative pt-32 pb-32 overflow-hidden min-h-[550px] flex items-center bg-slate-900">
+        <AnimatePresence mode="wait">
+          <motion.img 
+            key={heroImage}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+            src={heroImage} 
+            alt="Dashboard Hero" 
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         </AnimatePresence>
         
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/40 to-slate-50 dark:to-slate-950"></div>
         
         <div className="max-w-6xl mx-auto px-6 relative z-10 w-full">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-12">
-            <div className="space-y-6">
+            <div className="space-y-6 text-left">
               <motion.div 
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -148,44 +133,52 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       <main className="max-w-6xl mx-auto px-6 -mt-12 relative z-20 pb-24">
-        <motion.div 
-          initial={{ y: 40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"
-        >
-          {trips.length > 0 ? (
-            trips.map((trip) => (
-              <TripCard
-                key={trip.id}
-                {...trip}
-                onClick={handleTripClick}
-                onEdit={handleEditClick}
-              />
-            ))
-          ) : (
-            <div className="col-span-full bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800 p-12 md:p-24 text-center space-y-8 shadow-xl shadow-slate-200/50">
-              <div className="bg-slate-50 dark:bg-slate-800 w-24 h-24 rounded-full flex items-center justify-center mx-auto border border-slate-100 dark:border-slate-700 shadow-inner">
-                <Plane className="text-slate-300 dark:text-slate-600 w-12 h-12" />
+        {isLoading && trips.length === 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-72 bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm animate-pulse border border-slate-100 dark:border-slate-800"></div>
+            ))}
+          </div>
+        ) : (
+          <motion.div 
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"
+          >
+            {trips.length > 0 ? (
+              trips.map((trip) => (
+                <TripCard
+                  key={trip.id}
+                  {...trip}
+                  onClick={handleTripClick}
+                  onEdit={handleEditClick}
+                />
+              ))
+            ) : (
+              <div className="col-span-full bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800 p-12 md:p-24 text-center space-y-8 shadow-xl shadow-slate-200/50">
+                <div className="bg-slate-50 dark:bg-slate-800 w-24 h-24 rounded-full flex items-center justify-center mx-auto border border-slate-100 dark:border-slate-700 shadow-inner">
+                  <Plane className="text-slate-300 dark:text-slate-600 w-12 h-12" />
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">O mundo espera</h3>
+                  <p className="text-slate-500 dark:text-slate-400 font-medium text-lg">Você ainda não criou nenhum roteiro de viagem.</p>
+                </div>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="bg-slate-900 dark:bg-blue-600 hover:bg-black dark:hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] py-4 px-8 rounded-full transition-all shadow-lg cursor-pointer"
+                >
+                  Criar minha primeira viagem
+                </button>
               </div>
-              <div className="space-y-3">
-                <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">O mundo espera</h3>
-                <p className="text-slate-500 dark:text-slate-400 font-medium text-lg">Você ainda não criou nenhum roteiro de viagem.</p>
-              </div>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-slate-900 dark:bg-blue-600 hover:bg-black dark:hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] py-4 px-8 rounded-full transition-all shadow-lg cursor-pointer"
-              >
-                Criar minha primeira viagem
-              </button>
-            </div>
-          )}
-        </motion.div>
+            )}
+          </motion.div>
+        )}
       </main>
 
       <NewTripModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchData} />
       {editingTrip && <EditTripModal isOpen={!!editingTrip} onClose={() => setEditingTrip(null)} onSuccess={fetchData} trip={editingTrip} />}
-      <AppSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onSuccess={fetchData} currentHeroImage={heroImage || ''} />
+      <AppSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onSuccess={fetchData} currentHeroImage={heroImage} />
     </motion.div>
   );
 };

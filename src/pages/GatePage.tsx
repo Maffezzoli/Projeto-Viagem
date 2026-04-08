@@ -32,12 +32,13 @@ export const GatePage: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6"
+      transition={{ duration: 0.8 }}
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 transition-colors"
     >
       <motion.div 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
+        transition={{ delay: 0.2, duration: 0.6 }}
         className="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-[2.5rem] shadow-2xl max-w-sm w-full text-center space-y-8 border border-white/20 dark:border-slate-800"
       >
         <div className="bg-blue-600 w-20 h-20 rounded-[1.5rem] flex items-center justify-center mx-auto shadow-xl shadow-blue-600/30">
@@ -47,7 +48,7 @@ export const GatePage: React.FC = () => {
         <div className="space-y-2">
           <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Travel Planner</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">
-            Área restrita. Digite sua chave de acesso para gerenciar seus roteiros.
+            Área restrita. Digite sua senha de acesso para gerenciar seus roteiros.
           </p>
         </div>
 
@@ -61,9 +62,9 @@ export const GatePage: React.FC = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Sua senha secreta"
+                placeholder="Sua senha"
                 autoFocus
-                className="block w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-900 dark:text-white font-bold placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                className="block w-full pl-12 pr-4 py-4 bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-900 dark:text-white font-black text-lg placeholder:text-slate-400 dark:placeholder:text-slate-600"
               />
             </div>
             {error && (
@@ -93,7 +94,7 @@ export const GatePage: React.FC = () => {
         transition={{ delay: 0.5 }}
         className="mt-8 text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.3em]"
       >
-        Built for modern explorers
+        World Class Design & Security
       </motion.p>
     </motion.div>
   );
